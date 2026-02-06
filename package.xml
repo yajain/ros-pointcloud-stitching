@@ -4,7 +4,7 @@
   <version>0.0.1</version>
   <description>Crater RGB-D capture + stitching pipeline</description>
 
-  <maintainer email="yjain@greensightag.com">Yash Jain</maintainer>
+  <maintainer email="yashjain9339@gmail.com">Yash Jain</maintainer>
   <license>MIT</license>
 
   <buildtool_depend>catkin</buildtool_depend>
