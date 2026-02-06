@@ -8,9 +8,7 @@ import argparse
 import numpy as np
 import rosbag
 import rospy
-from geometry_msgs.msg import PoseStamped
 from nav_msgs.msg import Odometry
-from std_msgs.msg import String
 from std_srvs.srv import Trigger, TriggerResponse
 from pointcloud_stitching.srv import StartCapture, StartCaptureResponse
 

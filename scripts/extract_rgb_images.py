@@ -12,7 +12,6 @@ np.float = np.float64  # temp fix for ros_numpy
 import rosbag
 import rospy
 from sensor_msgs.msg import Image
-from std_msgs.msg import String
 from std_srvs.srv import Trigger, TriggerResponse
 from pointcloud_stitching.srv import StartCapture, StartCaptureResponse
 import ros_numpy
