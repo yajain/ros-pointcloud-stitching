@@ -8,6 +8,17 @@ import argparse
 import os
 
 def preprocess_rgbd_pair(i, rgb_dir, depth_dir):
+    """
+    Preprocesses a pair of RGB and depth images to create an Open3D RGBD image.
+
+    Args:
+        i (int): The index of the image pair to process.
+        rgb_dir (str): Path to the directory containing RGB images.
+        depth_dir (str): Path to the directory containing depth images.
+
+    Returns:
+        o3d.geometry.RGBDImage: An Open3D RGBD image created from the specified RGB and depth images.
+    """
     im_depth = o3d.io.read_image(os.path.join(depth_dir, f"depth_fixed_{i:03d}.png"))
     im_color = o3d.io.read_image(os.path.join(rgb_dir, f"rgb_{i:03d}.png"))
     rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(
@@ -19,6 +30,20 @@ def preprocess_rgbd_pair(i, rgb_dir, depth_dir):
     return rgbd
 
 def preprocess_pointcloud(rgbd, intrinsic, extrinsic, voxel_size):
+    """
+    Preprocesses an RGBD image to generate a point cloud and its downsampled version.
+
+    Args:
+        rgbd (o3d.geometry.RGBDImage): The RGBD image to process.
+        intrinsic (o3d.camera.PinholeCameraIntrinsic): The intrinsic parameters of the camera.
+        extrinsic (numpy.ndarray): The extrinsic transformation matrix for the camera.
+        voxel_size (float): The size of the voxel for downsampling the point cloud.
+
+    Returns:
+        tuple:
+            - o3d.geometry.PointCloud: The original point cloud generated from the RGBD image.
+            - o3d.geometry.PointCloud: The downsampled point cloud with estimated normals.
+    """
     pcd = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd, intrinsic, extrinsic)
     pcd_down = pcd.voxel_down_sample(voxel_size)
     pcd_down.estimate_normals(
@@ -27,6 +52,18 @@ def preprocess_pointcloud(rgbd, intrinsic, extrinsic, voxel_size):
     return pcd, pcd_down
 
 def run_colored_icp(source_down, target_down, init_transform, max_corr_dist):
+    """
+    Runs the Colored Iterative Closest Point (ICP) algorithm to align two point clouds.
+
+    Args:
+        source_down (o3d.geometry.PointCloud): The downsampled source point cloud.
+        target_down (o3d.geometry.PointCloud): The downsampled target point cloud.
+        init_transform (numpy.ndarray): The initial transformation matrix to align the source to the target.
+        max_corr_dist (float): The maximum correspondence distance for point cloud alignment.
+
+    Returns:
+        o3d.pipelines.registration.RegistrationResult: The result of the Colored ICP algorithm, containing the transformation matrix and fitness score.
+    """
     return o3d.pipelines.registration.registration_colored_icp(
         source_down, target_down, max_corr_dist, init_transform,
         o3d.pipelines.registration.TransformationEstimationForColoredICP(),

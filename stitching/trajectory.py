@@ -11,6 +11,18 @@ import argparse
 import numpy as np
 
 def load_intrinsics(yaml_path):
+    """
+    Loads camera intrinsic parameters from a YAML file.
+
+    Args:
+        yaml_path (str): Path to the YAML file containing camera intrinsics.
+
+    Returns:
+        tuple:
+            - list: A 3x3 intrinsic matrix in row-major order.
+            - int: The width of the camera image.
+            - int: The height of the camera image.
+    """
     with open(yaml_path, 'r') as f:
         data = yaml.safe_load(f)
 
@@ -30,6 +42,18 @@ def load_intrinsics(yaml_path):
     return intrinsic_matrix, width, height
 
 def build_trajectory_json(extrinsics, intrinsic_matrix, width, height):
+    """
+    Builds a trajectory JSON object compatible with Open3D from extrinsic matrices and camera intrinsics.
+
+    Args:
+        extrinsics (numpy.ndarray): A (N, 4, 4) array of extrinsic matrices, where N is the number of frames.
+        intrinsic_matrix (list): A 3x3 intrinsic matrix in row-major order.
+        width (int): The width of the camera image.
+        height (int): The height of the camera image.
+
+    Returns:
+        dict: A dictionary representing the trajectory JSON, containing camera parameters and transformations.
+    """
     trajectory = {
         "class_name": "PinholeCameraTrajectory",
         "parameters": [],
