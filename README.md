@@ -1,6 +1,6 @@
 # Crater RGB-D Data Capture and Stitching Pipeline
 
-This repository contains a ROS-based pipeline for capturing synchronized RGB, depth, and pose data of craters using a RealSense D456 camera, and reconstructing textured 3D meshes via Open3D's Colored ICP.
+This repository contains a ROS-based pipeline for capturing synchronized RGB, depth, and pose data of any object of interest using a RealSense camera, and reconstructing textured 3D meshes via Open3D's Colored ICP.
 
 ---
 
@@ -85,13 +85,15 @@ python3 extract_service_control.py
 To begin synchronized data capture across all three extractors:
 
 ```bash
-rosservice call /start_capture_all "data: '<crater_name>'"
+rosservice call /start_capture_all "data: '<object_name>'"
 ```
 
 Example:
 ```bash
 rosservice call /start_capture_all "data: 'Crater_1'"
-```
+```  
+Here we are using a drone equipped with a realsense camera to capture image of a crater on the ground.  
+
 
 Let the system run for the duration of your data collection.
 
@@ -108,18 +110,18 @@ rosservice call /stop_capture_all
 After running, the data will be organized as:
 
 ```
-depth_output/<crater_name>/
+depth_output/<object_name>/
     depth_fixed_000.png
     depth_planar_000.npy
     depth_vis_000.png
     depth_timestamps.npy
 
-rgb_output/<crater_name>/
+rgb_output/<object_name>/
     rgb_000.png
     rgb_001.png
     ...
 
-pose_output/<crater_name>/
+pose_output/<object_name>/
     pose_log.npy
 
 intrinsics_output/
@@ -133,19 +135,19 @@ intrinsics_output/
 1. Align poses to depth timestamps:
 
 ```bash
-python align_extrinsics.py   --depth-ts depth_output/<crater_name>/depth_timestamps.npy   --pose-log pose_output/<crater_name>/pose_log.npy   --out-dir extrinsics_output
+python align_extrinsics.py   --depth-ts depth_output/<object_name>/depth_timestamps.npy   --pose-log pose_output/<object_name>/pose_log.npy   --out-dir extrinsics_output
 ```
 
 2. Generate Open3D trajectory JSON:
 
 ```bash
-python trajectory.py   --extrinsics extrinsics_output/<crater_name>/extrinsics_matrices.npy   --intrinsics intrinsics_output/camera_intrinsics.yaml   --output trajectory_<crater_name>.json
+python trajectory.py   --extrinsics extrinsics_output/<object_name>/extrinsics_matrices.npy   --intrinsics intrinsics_output/camera_intrinsics.yaml   --output trajectory_<object_name>.json
 ```
 
 3. Run Colored ICP stitching:
 
 ```bash
-python stitcher.py   --trajectory trajectory_<crater_name>.json   --rgb_dir rgb_output/<crater_name>   --depth_dir depth_output/<crater_name>
+python stitcher.py   --trajectory trajectory_<object_name>.json   --rgb_dir rgb_output/<object_name>   --depth_dir depth_output/<object_name>
 ```
 
 ---
@@ -155,29 +157,29 @@ python stitcher.py   --trajectory trajectory_<crater_name>.json   --rgb_dir rgb_
 After running the `align_extrinsics.py`, `trajectory.py`, and `stitcher.py` scripts, your folder structure will look like this:
 
 ```
-depth_output/<crater_name>/
+depth_output/<object_name>/
     depth_fixed_000.png
     depth_planar_000.npy
     depth_vis_000.png
     depth_timestamps.npy
 
-rgb_output/<crater_name>/
+rgb_output/<object_name>/
     rgb_000.png
     rgb_001.png
     ...
 
-pose_output/<crater_name>/
+pose_output/<object_name>/
     pose_log.npy
 
 intrinsics_output/
     camera_intrinsics.yaml
 
-extrinsics_output/<crater_name>/
+extrinsics_output/<object_name>/
     extrinsics_data.npy
     extrinsics_matrices.npy
 
-trajectory_<crater_name>.json                 # Open3D-compatible camera path
-stitched_mesh_<crater_name>.ply               # Final textured mesh
+trajectory_<object_name>.json                 # Open3D-compatible camera path
+stitched_mesh_<object_name>.ply               # Final textured mesh
 ```
 
 ### Where Each File Comes From
@@ -194,5 +196,5 @@ stitched_mesh_<crater_name>.ply               # Final textured mesh
 
 - Run 5 scripts in parallel (RGB, depth, pose, intrinsics, controller)
 - Trigger start/stop using `/start_capture_all` and `/stop_capture_all`
-- Each extractor saves data into its own `..._output/<crater_name>/` folder
+- Each extractor saves data into its own `..._output/<object_name>/` folder
 - Use the alignment + trajectory + stitching scripts for final 3D mesh
