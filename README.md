@@ -1,6 +1,6 @@
 # Crater RGB-D Data Capture and Stitching Pipeline
 
-This repository contains a ROS-based pipeline for capturing synchronized RGB, depth, and pose data of any object of interest using a RealSense camera, and reconstructing textured 3D meshes via Open3D's Colored ICP.
+This repository contains a ROS-based pipeline for capturing synchronized RGB, depth, and pose data of any object of interest using a RealSense camera, and reconstructing textured 3D meshes via Open3D's Colored ICP. This assumes that RGB, Depth and IMU data is being published to a certain ROS topic. This code subscribes to those specific ROS topics to capture RGB, Depth and IMU data to stitch together point clouds.  
 
 ---
 
